@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+// For Ethereum Sepolia
+
 
 /**
  * @notice Manages unique ID mappings between addresses and sequential IDs

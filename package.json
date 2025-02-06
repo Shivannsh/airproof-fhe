@@ -29,6 +29,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.13.4",
     "fhevm": "^0.5.9",
+    "fhevm-contracts": "^0.2.1",
     "fhevmjs": "^0.5.8",
     "solc": "^0.8.28",
     "winston": "^3.17.0"
