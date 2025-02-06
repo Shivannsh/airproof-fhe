@@ -2,7 +2,8 @@ import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import { createInstance } from "../utils/create-instance.js";
 import { loadABI } from "../utils/load-abi.js";
 import logger from "../utils/logger.js";
-
+const PassportIDAddress = "0x319C2E9ed2425c8253207F9a52909289A123c783";
+const IdMappingAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
 
 import { ethers } from "ethers";
 
@@ -23,183 +24,45 @@ const initializeContract = async (
   return { contract, wallet };
 };
 
-export const generateId = async (
+export const registerIdentity = async (
   filename,
   networkUrl,
   privateKey,
   contractAddress,
 ) => {
   try {
-    const { contract } = await initializeContract(
+    const { contract, wallet } = await initializeContract(
       filename,
       networkUrl,
       privateKey,
       contractAddress,
+      [IdMappingAddress]
     );
-    const transaction = await contract.generateId();
-    console.log()
-    return transaction.hash;
+    // Create FHEVM instance for encryption
+    const fhevmInstance = await createInstance();
+    // Prepare encrypted input
+    const encryptedInput = fhevmInstance.createEncryptedInput(
+      contractAddress,
+      wallet.address,
+    );
+    encryptedInput.addBytes256("hash")
+    encryptedInput.addBytes256("fistName")
+    encryptedInput.addBytes256("lastName")
+    encryptedInput.add64(949837716);
+    const encryptedInputs = await encryptedInput.encrypt();
+
+    // Execute encrypted transfer
+    const transaction = await contract.registerIdentity(
+      1,
+      encryptedInputs.handles[0],
+      encryptedInputs.handles[1],
+      encryptedInputs.handles[2],
+      encryptedInputs.handles[3],
+      encryptedInputs.inputProof,
+    );
+
+    return transaction;
   } catch (error) {
-    handleError("generateId", error);
-    throw error;
+    logger.error(`Transfer Tokens Error: ${error.message}`);
   }
 };
-
-export const getId = async (
-  filename,
-  networkUrl,
-  privateKey,
-  contractAddress,
-) => {
-  try {
-    const { contract } = await initializeContract(
-      filename,
-      networkUrl,
-      privateKey,
-      contractAddress,
-    );
-    console.log(privateKey)
-    const wallet = new ethers.Wallet(privateKey);
-    const address = wallet.address
-    console.log(address.toString())
-    const id = await contract.getId(address);
-    return id.toString();
-  } catch (error) {
-    handleError("getID", error);
-    throw error;
-  }
-  };
-
-export const getAddress = async (
-  filename,
-  networkUrl,
-  privateKey,
-  contractAddress,
-) => {
-  try {
-    const { contract } = await initializeContract(
-      filename,
-      networkUrl,
-      privateKey,
-      contractAddress,
-    );
-    const address = await contract.getAddress(2);
-    console.log()
-    return address.toString();
-  } catch (error) {
-    handleError("getID", error);
-    throw error;
-  }
-};
-
-// export const transferTokens = async (
-//   filename,
-//   networkUrl,
-//   privateKey,
-//   contractAddress,
-// ) => {
-//   try {
-//     const { contract, wallet } = await initializeContract(
-//       filename,
-//       networkUrl,
-//       privateKey,
-//       contractAddress,
-//     );
-//     const fhevmInstance = await createInstance();
-
-//     const encryptedInput = fhevmInstance.createEncryptedInput(
-//       contractAddress,
-//       wallet.address,
-//     );
-//     encryptedInput.add64(1337);
-//     const encryptedInputs = encryptedInput.encrypt();
-
-//     const transaction = await contract["transfer(address,bytes32,bytes)"](
-//       wallet.address,
-//       encryptedInputs.handles[0],
-//       encryptedInputs.inputProof,
-//     );
-
-//     logger.info(`Tx Receipt: ${transaction.hash}`);
-//     return transaction.hash;
-//   } catch (error) {
-//     handleError("transferTokens", error);
-//     throw error;
-//   }
-// };
-
-// export const reencryptUserBalance = async (
-//   filename,
-//   networkUrl,
-//   privateKeyA,
-//   contractAddress,
-// ) => {
-//   try {
-//     const { contract, wallet } = await initializeContract(
-//       filename,
-//       networkUrl,
-//       privateKeyA,
-//       contractAddress,
-//     );
-//     const instance = await createInstance();
-
-//     const { publicKey, privateKeyB } = instance.generateKeypair();
-//     const eip712 = instance.createEIP712(publicKey, contractAddress);
-//     const signature = await wallet.signTypedData(
-//       eip712.domain,
-//       { Reencrypt: eip712.types.Reencrypt },
-//       eip712.message,
-//     );
-//     const balance = await contract.balanceOf(wallet.address);
-//     logger.info(`Balance: ${balance}`);
-
-//     const userBalance = await instance.reencrypt(
-//       balance,
-//       privateKeyB,
-//       publicKey,
-//       signature.replace("0x", ""),
-//       contractAddress,
-//       wallet.address,
-//     );
-
-//     logger.info(`User Balance: ${userBalance}`);
-//   } catch (error) {
-//     handleError("reencryptUserBalance", error);
-//     throw error;
-//   }
-// };
-
-// export const approveTransaction = async (
-//   filename,
-//   networkUrl,
-//   privateKey,
-//   contractAddress,
-// ) => {
-//   try {
-//     const { contract, wallet } = await initializeContract(
-//       filename,
-//       networkUrl,
-//       privateKey,
-//       contractAddress,
-//     );
-//     const fhevmInstance = await createInstance();
-
-//     const encryptedInput = fhevmInstance.createEncryptedInput(
-//       contractAddress,
-//       wallet.address,
-//     );
-//     encryptedInput.add64(1337);
-//     const encryptedInputs = encryptedInput.encrypt();
-
-//     const transaction = await contract["approve(address,bytes32,bytes)"](
-//       wallet.address,
-//       encryptedInputs.handles[0],
-//       encryptedInputs.inputProof,
-//     );
-
-//     return transaction.hash;
-//   } catch (error) {
-//     handleError("approveTransaction", error);
-//     throw error;
-//   }
-// };

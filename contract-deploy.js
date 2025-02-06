@@ -7,12 +7,14 @@ import { deployContract } from "./src/deploy.js";
 
 let { networkUrl, mnemonic } = getEnvironmentVariables();
 let { privateKeyTest } = deriveWalletsAndDetails(mnemonic);
+// let contractName = "IdMapping.sol";
+// let contractName = "PassportID.sol";
 let contractName = "EmployerClaim.sol";
 
 async function deployAndSave() {
   try {
-    const PassportIDAddress = "0x3a85dfB71Dbe97bA9F5af4f82EcCCaEab855Cc73";
-    const IdMappingAddress = "0x786FA365fc8b2161Fa66DB74d50930aD71061245";
+    const PassportIDAddress = "0x319C2E9ed2425c8253207F9a52909289A123c783";
+    const IdMappingAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
     // const EmployerClaim = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
     
 
