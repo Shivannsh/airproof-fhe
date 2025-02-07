@@ -7,11 +7,11 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
  * @notice Manages unique ID mappings between addresses and sequential IDs
  * @dev Inherits from Ownable2Step for secure ownership transfer
  */
-contract IdMapping is Ownable2Step {
-    error IdAlreadyGenerated();
+contract IdStorage is Ownable2Step {
+    error IdAlreadyRegistered();
     error InvalidAddress();
     error IdOverflow();
-    error NoIdGenerated();
+    error NoIdRegistered();
     error InvalidId();
     error NoAddressFound();
 
@@ -29,7 +29,7 @@ contract IdMapping is Ownable2Step {
     }
 
     function generateId() public returns (uint256) {
-        if (addressToId[msg.sender] != 0) revert IdAlreadyGenerated();
+        if (addressToId[msg.sender] != 0) revert IdAlreadyRegistered();
         if (msg.sender == address(0)) revert InvalidAddress();
 
         uint256 newId = nextId;
@@ -44,7 +44,7 @@ contract IdMapping is Ownable2Step {
 
     function getId(address _addr) public view returns (uint256) {
         if (_addr == address(0)) revert InvalidAddress();
-        if (addressToId[_addr] == 0) revert NoIdGenerated();
+        if (addressToId[_addr] == 0) revert NoIdRegistered();
         return addressToId[_addr];
     }
 
@@ -57,7 +57,7 @@ contract IdMapping is Ownable2Step {
 
     function resetIdForAddress(address _addr) external onlyOwner {
         uint256 id = addressToId[_addr];
-        if (id == 0) revert NoIdGenerated();
+        if (id == 0) revert NoIdRegistered();
 
         delete addressToId[_addr];
         delete idToAddress[id];

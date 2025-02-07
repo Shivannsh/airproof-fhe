@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import "./core/lib/TFHE.sol";
-import "./IdMapping.sol";
+import "./IdStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract PassportID is AccessControl {
-    /// @dev Constants
+/// @dev Implements role-based access control for registrars and admins to manage identity registration
+contract UserID is AccessControl {
     bytes32 public constant REGISTRAR_ROLE = keccak256("REGISTRAR_ROLE");
     bytes32 public constant OWNER_ROLE = keccak256("OWNER_ROLE");
 
@@ -15,23 +15,26 @@ contract PassportID is AccessControl {
     error AccessNotPermitted();
     error ClaimGenerationFailed(bytes data);
 
+    /// @dev Structure to hold encrypted identity data
     struct Identity {
         euint64 id; /// @dev Encrypted unique ID
-        ebytes256 biodata; /// @dev Encrypted biodata (e.g., biometric data or hashed identity data)
+        euint64 adhaarCard; /// @dev Encrypted Aadhar card number
         ebytes256 firstname; /// @dev Encrypted first name
         ebytes256 lastname; /// @dev Encrypted last name
-        euint64 birthdate; /// @dev Encrypted birthdate for age verification
+        euint64 birthdate; /// @dev Encrypted birthdate for age verification in EPOCH format
     }
 
-    IdMapping private idMapping;
+    IdStorage private idStorage;
+
+    /// @dev Mapping to store identities by user ID
     mapping(uint256 => Identity) private citizenIdentities;
+    /// @dev Mapping to track registered identities
     mapping(uint256 => bool) public registered;
 
     event IdentityRegistered(address indexed user);
 
-    constructor(address _idMappingAddress) {
-        // TFHE.setFHEVM(FHEVMConfig.defaultConfig());
-        idMapping = IdMapping(_idMappingAddress);
+    constructor(address _idStorageAddress) {
+        idStorage = IdStorage(_idStorageAddress);
         _grantRole(OWNER_ROLE, msg.sender); /// @dev Admin role for contract owner
         _grantRole(REGISTRAR_ROLE, msg.sender); /// @dev Registrar role for contract owner
     }
@@ -44,9 +47,11 @@ contract PassportID is AccessControl {
         _revokeRole(REGISTRAR_ROLE, registrar);
     }
 
+    ///Creates a new encrypted identity record
+    ///@dev Only admin role can register new identities. All data is stored in encrypted form
     function registerIdentity(
         uint256 userId,
-        einput biodata,
+        einput adhaarCard,
         einput firstname,
         einput lastname,
         einput birthdate,
@@ -60,7 +65,7 @@ contract PassportID is AccessControl {
         /// @dev Store the encrypted identity data
         citizenIdentities[userId] = Identity({
             id: newId,
-            biodata: TFHE.asEbytes256(biodata, inputProof),
+            adhaarCard: TFHE.asEuint64(adhaarCard, inputProof),
             firstname: TFHE.asEbytes256(firstname, inputProof),
             lastname: TFHE.asEbytes256(lastname, inputProof),
             birthdate: TFHE.asEuint64(birthdate, inputProof)
@@ -69,52 +74,42 @@ contract PassportID is AccessControl {
         registered[userId] = true; /// @dev Mark the identity as registered
 
         /// @dev Get the address associated with the user ID
-        address addressToBeAllowed = idMapping.getAddr(userId);
+        address addressToBeAllowed = idStorage.getAddr(userId);
 
         /// @dev Allow the user to access their own data
         TFHE.allow(citizenIdentities[userId].id, addressToBeAllowed);
-        TFHE.allow(citizenIdentities[userId].biodata, addressToBeAllowed);
+        TFHE.allow(citizenIdentities[userId].adhaarCard, addressToBeAllowed);
         TFHE.allow(citizenIdentities[userId].firstname, addressToBeAllowed);
         TFHE.allow(citizenIdentities[userId].lastname, addressToBeAllowed);
         TFHE.allow(citizenIdentities[userId].birthdate, addressToBeAllowed);
 
         /// @dev Allow the contract to access the data
         TFHE.allow(citizenIdentities[userId].id, address(this));
-        TFHE.allow(citizenIdentities[userId].biodata, address(this));
+        TFHE.allow(citizenIdentities[userId].adhaarCard, address(this));
         TFHE.allow(citizenIdentities[userId].firstname, address(this));
         TFHE.allow(citizenIdentities[userId].lastname, address(this));
         TFHE.allow(citizenIdentities[userId].birthdate, address(this));
 
         emit IdentityRegistered(addressToBeAllowed); /// @dev Emit event for identity registration
-
         return true;
     }
 
-    function getIdentity(
-        uint256 userId
-    )
-        public
-        view
-        virtual
-        returns (euint64, ebytes256, ebytes256, ebytes256, euint64)
-    {
+    /// Retrieves the complete encrypted identity record for a user
+    function getIdentity( uint256 userId) public view virtual returns (euint64, euint64, ebytes256, ebytes256, euint64){
         if (!registered[userId]) revert IdentityNotRegistered();
         return (
             citizenIdentities[userId].id,
-            citizenIdentities[userId].biodata,
+            citizenIdentities[userId].adhaarCard,
             citizenIdentities[userId].firstname,
             citizenIdentities[userId].lastname,
             citizenIdentities[userId].birthdate
         );
     }
 
-    function getBirthdate(
-        uint256 userId
-    ) public view virtual returns (euint64) {
+    function getBirthdate( uint256 userId ) public view virtual returns (euint64) {
         // Check registration first
         if (!registered[userId]) {
-            revert IdentityNotRegistered();
-        }
+            revert IdentityNotRegistered();}
 
         // Get identity from storage
         Identity storage identity = citizenIdentities[userId];
@@ -123,16 +118,18 @@ contract PassportID is AccessControl {
         return birthdate;
     }
 
-    function getMyIdentityFirstname(
-        uint256 userId
-    ) public view virtual returns (ebytes256) {
+    function getMyIdentityFirstname( uint256 userId ) public view virtual returns (ebytes256) {
         if (!registered[userId]) revert IdentityNotRegistered();
         return citizenIdentities[userId].firstname;
     }
 
+    /// Generates a verification claim using the user's identity data
+    /// @dev Temporarily grants claim contract access to required encrypted data
+    /// @param claimAddress Contract address that will process the claim
+    /// @param claimFn Function signature in the claim contract to call
     function generateClaim(address claimAddress, string memory claimFn) public {
         /// @dev Only the msg.sender that is registered under the user ID can make the claim
-        uint256 userId = idMapping.getId(msg.sender);
+        uint256 userId = idStorage.getId(msg.sender);
 
         /// @dev Grant temporary access for citizen's birthdate to be used in claim generation
         TFHE.allowTransient(citizenIdentities[userId].birthdate, claimAddress);

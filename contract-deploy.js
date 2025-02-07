@@ -7,15 +7,15 @@ import { deployContract } from "./src/deploy.js";
 
 let { networkUrl, mnemonic } = getEnvironmentVariables();
 let { privateKeyTest } = deriveWalletsAndDetails(mnemonic);
-// let contractName = "IdMapping.sol";
-// let contractName = "PassportID.sol";
-let contractName = "EmployerClaim.sol";
+// let contractName = "IdStorage.sol";
+// let contractName = "UserID.sol";
+let contractName = "CitizenClaim.sol";
 
 async function deployAndSave() {
   try {
-    const PassportIDAddress = "0x319C2E9ed2425c8253207F9a52909289A123c783";
-    const IdMappingAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
-    // const EmployerClaim = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
+    const UserIDContractAddress = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
+    const IdStorageContractAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
+    // const CitizenClaim = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
     
 
     logger.boldinfo("========== DEPLOYING USER CONTRACT ==========");
@@ -24,7 +24,7 @@ async function deployAndSave() {
       networkUrl,
       privateKeyTest,
       contractName,
-      [IdMappingAddress,PassportIDAddress]
+      [IdStorageContractAddress,UserIDContractAddress]
     );
     const contractAddress = await contract.getAddress();
 

@@ -3,13 +3,12 @@ import path, { resolve } from "path";
 import logger from "./utils/logger.js";
 import { getEnvironmentVariables } from "./utils/env.js";
 import { deriveWalletsAndDetails } from "./utils/wallet.js";
-import { generateId, getId , getAddress } from "./test/IdMapping.js";
-import { registerIdentity } from "./test/PassportID.js";
-
+import { generateId, getId , getAddress } from "./test/IdStorage.js";
+import { getIdentity,registerIdentity,generateClaim, getBirthdate , getMyIdentityFirstname } from "./test/UserID.js";
 let { networkUrl, mnemonic } = getEnvironmentVariables();
 let { privateKeyTest } = deriveWalletsAndDetails(mnemonic);
 console.log(privateKeyTest)
-let contractName = "PassportID.sol";
+let contractName = "UserID.sol";
 let filename = contractName.split(".")[0];
 
 async function interactWithContract() {
@@ -18,7 +17,9 @@ async function interactWithContract() {
       path.join(process.cwd(), "data", `${contractName}.txt`),
       "utf8",
     );
-// =============================== IdMapping.sol ================================================
+
+// =============================== IdStorage.sol ================================================
+   
     // const generatedId = await generateId(
     //   filename,
     //   networkUrl,
@@ -45,8 +46,11 @@ async function interactWithContract() {
     //   contractAddress
     // );
     // logger.info(`getAddress: ${addressResult}`);
+
 // ================================================================================================
 
+
+// =============================== UserID.sol ====================================================
 
 const registerIdentityResult = await registerIdentity(
       filename,
@@ -57,43 +61,43 @@ const registerIdentityResult = await registerIdentity(
     logger.info(`registerIdentity: ${registerIdentityResult}`);
 
 
-    // await decryptMintedTokens(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress,
-    // );
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+const getIdentityResult = await getIdentity(
+  filename,
+  networkUrl,
+  privateKeyTest,
+  contractAddress
+);
+logger.info(`getIdentity: ${getIdentityResult}`);
 
-    // await fetchTokenDetails(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress,
-    // );
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
+const birthdate = await getBirthdate(
+  filename,
+  networkUrl,
+  privateKeyTest,
+  contractAddress
+);
+logger.info(`getBirthdate: ${birthdate}`);
 
-    // await transferTokens(filename, networkUrl, privateKeyTest, contractAddress);
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
+const getMyIdentityFirstnameResult = await getMyIdentityFirstname(
+  filename,
+  networkUrl,
+  privateKeyTest,
+  contractAddress
+);
+logger.info(`getMyIdentityFirstname: ${getMyIdentityFirstnameResult}`)
 
-    // await reencryptUserBalance(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress,
-    // );
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
+const generateClaimResult = await generateClaim(
+  filename,
+  networkUrl,
+  privateKeyTest,
+  contractAddress,  
+);
+logger.info(`generateClaim: ${generateClaimResult}`)
 
-    // const approveResult = await approveTransaction(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress,
-    // );
-    // logger.info(`Approve Result: ${approveResult}`);
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
+// ================================================================================================
+
   } catch (error) {
     logger.error("Error during tests:", error);
   }
 }
+
 interactWithContract();
