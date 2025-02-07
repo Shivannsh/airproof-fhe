@@ -20,32 +20,32 @@ async function interactWithContract() {
 
 // =============================== IdStorage.sol ================================================
    
-    // const generatedId = await generateId(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress,
-    // );
-    // logger.info(`generateID: ${generatedId}`);
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    const generatedId = await generateId(
+      filename,
+      networkUrl,
+      privateKeyTest,
+      contractAddress,
+    );
+    logger.info(`generateID: ${generatedId}`);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
 
-    // const getIDResult = await getId(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress
-    // );
-    // logger.info(`getID: ${getIDResult}`);
+    const getIDResult = await getId(
+      filename,
+      networkUrl,
+      privateKeyTest,
+      contractAddress
+    );
+    logger.info(`getID: ${getIDResult}`);
 
 
-    // const addressResult = await getAddress(
-    //   filename,
-    //   networkUrl,
-    //   privateKeyTest,
-    //   contractAddress
-    // );
-    // logger.info(`getAddress: ${addressResult}`);
+    const addressResult = await getAddress(
+      filename,
+      networkUrl,
+      privateKeyTest,
+      contractAddress
+    );
+    logger.info(`getAddress: ${addressResult}`);
 
 // ================================================================================================
 
