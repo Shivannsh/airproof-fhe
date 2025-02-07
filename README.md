@@ -1,3 +1,8 @@
+## Github Links 
+- ZK-Backend - https://github.com/whoisgautxm/AirProof
+- Contracts - https://github.com/Shivannsh/airproof-fhe
+- Walkthrough Video - https://youtu.be/pxyek5mhxMA
+
 # Hands-on fhEVM
 
 Welcome to the Hands-on fhEVM guide! 🚀
