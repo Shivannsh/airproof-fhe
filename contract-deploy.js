@@ -13,8 +13,8 @@ let contractName = "EmployerClaim.sol";
 
 async function deployAndSave() {
   try {
-    const PassportIDAddress = "0x319C2E9ed2425c8253207F9a52909289A123c783";
-    const IdMappingAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
+    const PassportIDAddress = "0x6364660faF9658fbc169C4439F63817f5C83580F";
+    const IdMappingAddress = "0x440300FfA6C851b595fE2e400CC92E1cd094645A";
     // const EmployerClaim = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
     
 
@@ -24,7 +24,7 @@ async function deployAndSave() {
       networkUrl,
       privateKeyTest,
       contractName,
-      [IdMappingAddress,PassportIDAddress]
+      [IdMappingAddress, PassportIDAddress]
     );
     const contractAddress = await contract.getAddress();
 

@@ -83,7 +83,7 @@ export const getAddress = async (
       privateKey,
       contractAddress,
     );
-    const address = await contract.getAddress(2);
+    const address = await contract.getAddress(1);
     console.log()
     return address.toString();
   } catch (error) {

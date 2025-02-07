@@ -17,9 +17,7 @@ contract PassportID is AccessControl {
 
     struct Identity {
         euint64 id; /// @dev Encrypted unique ID
-        ebytes256 biodata; /// @dev Encrypted biodata (e.g., biometric data or hashed identity data)
-        ebytes256 firstname; /// @dev Encrypted first name
-        ebytes256 lastname; /// @dev Encrypted last name
+        ebytes256 name; /// @dev Encrypted first name
         euint64 birthdate; /// @dev Encrypted birthdate for age verification
     }
 
@@ -46,9 +44,7 @@ contract PassportID is AccessControl {
 
     function registerIdentity(
         uint256 userId,
-        einput biodata,
-        einput firstname,
-        einput lastname,
+        einput name,
         einput birthdate,
         bytes calldata inputProof
     ) public virtual onlyRole(REGISTRAR_ROLE) returns (bool) {
@@ -60,9 +56,7 @@ contract PassportID is AccessControl {
         /// @dev Store the encrypted identity data
         citizenIdentities[userId] = Identity({
             id: newId,
-            biodata: TFHE.asEbytes256(biodata, inputProof),
-            firstname: TFHE.asEbytes256(firstname, inputProof),
-            lastname: TFHE.asEbytes256(lastname, inputProof),
+            name: TFHE.asEbytes256(name, inputProof),
             birthdate: TFHE.asEuint64(birthdate, inputProof)
         });
 
@@ -73,16 +67,12 @@ contract PassportID is AccessControl {
 
         /// @dev Allow the user to access their own data
         TFHE.allow(citizenIdentities[userId].id, addressToBeAllowed);
-        TFHE.allow(citizenIdentities[userId].biodata, addressToBeAllowed);
-        TFHE.allow(citizenIdentities[userId].firstname, addressToBeAllowed);
-        TFHE.allow(citizenIdentities[userId].lastname, addressToBeAllowed);
+        TFHE.allow(citizenIdentities[userId].name, addressToBeAllowed);
         TFHE.allow(citizenIdentities[userId].birthdate, addressToBeAllowed);
 
         /// @dev Allow the contract to access the data
         TFHE.allow(citizenIdentities[userId].id, address(this));
-        TFHE.allow(citizenIdentities[userId].biodata, address(this));
-        TFHE.allow(citizenIdentities[userId].firstname, address(this));
-        TFHE.allow(citizenIdentities[userId].lastname, address(this));
+        TFHE.allow(citizenIdentities[userId].name, address(this));
         TFHE.allow(citizenIdentities[userId].birthdate, address(this));
 
         emit IdentityRegistered(addressToBeAllowed); /// @dev Emit event for identity registration
@@ -96,14 +86,12 @@ contract PassportID is AccessControl {
         public
         view
         virtual
-        returns (euint64, ebytes256, ebytes256, ebytes256, euint64)
+        returns (euint64, ebytes256, euint64)
     {
         if (!registered[userId]) revert IdentityNotRegistered();
         return (
             citizenIdentities[userId].id,
-            citizenIdentities[userId].biodata,
-            citizenIdentities[userId].firstname,
-            citizenIdentities[userId].lastname,
+            citizenIdentities[userId].name,
             citizenIdentities[userId].birthdate
         );
     }
@@ -123,11 +111,11 @@ contract PassportID is AccessControl {
         return birthdate;
     }
 
-    function getMyIdentityFirstname(
+    function getMyIdentityName(
         uint256 userId
     ) public view virtual returns (ebytes256) {
         if (!registered[userId]) revert IdentityNotRegistered();
-        return citizenIdentities[userId].firstname;
+        return citizenIdentities[userId].name;
     }
 
     function generateClaim(address claimAddress, string memory claimFn) public {

@@ -3,7 +3,7 @@ import { createInstance } from "../utils/create-instance.js";
 import { loadABI } from "../utils/load-abi.js";
 import logger from "../utils/logger.js";
 const PassportIDAddress = "0x319C2E9ed2425c8253207F9a52909289A123c783";
-const IdMappingAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
+const IdMappingAddress = "0x440300FfA6C851b595fE2e400CC92E1cd094645A";
 
 import { ethers } from "ethers";
 
@@ -45,9 +45,7 @@ export const registerIdentity = async (
       contractAddress,
       wallet.address,
     );
-    encryptedInput.addBytes256("hash")
-    encryptedInput.addBytes256("fistName")
-    encryptedInput.addBytes256("lastName")
+    encryptedInput.addBytes256("ShivanshGupta")
     encryptedInput.add64(949837716);
     const encryptedInputs = await encryptedInput.encrypt();
 
@@ -56,13 +54,11 @@ export const registerIdentity = async (
       1,
       encryptedInputs.handles[0],
       encryptedInputs.handles[1],
-      encryptedInputs.handles[2],
-      encryptedInputs.handles[3],
       encryptedInputs.inputProof,
     );
 
     return transaction;
   } catch (error) {
-    logger.error(`Transfer Tokens Error: ${error.message}`);
+    logger.error(`Identity Registration Err25o: ${error.message}`);
   }
 };
