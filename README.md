@@ -118,13 +118,24 @@ This project is licensed under the **MIT License**.
   - Permissioned decryption
 
 ## 🔄 Workflow
-1. Off-chain Attestation → ZK Proof Generation
-2. Public Output Extraction → FHE Contract Inputs
-3. ID Assignment → Encrypted Storage
-4. Claim Verification → Privacy-Preserving Result
 
-![Identity Verification Flow](images/workflow.jpeg)
-*Figure 1: Workflow*
+1. **Trusted Authority Attestation**  
+   - Off-chain verification of government ID documents
+   - Generate ZK proof using Succinct SP1 ZKVM
+2. **User Registration**  
+   - Generate FHE keypair via `IdStorage.sol` (lines 84-91)
+   - Store encrypted Id in `UserID.sol` (lines 100-105)
+
+3. **Encrypted Claim Generation**  
+   - Extract public outputs (name, DOB) as FHE inputs
+   - Store encrypted attestation in blockchain state
+
+4. **Privacy-Preserving Verification**  
+   - Relying parties request age verification via `CitizenClaim.sol`
+   - Contract returns encrypted boolean result without revealing DOB
+
+![End-to-End Workflow](images/workflow.jpeg)  
+*Figure 2: Confidential Identity Verification Process*
 
 ## 🛣️ Future Roadmap
 - **Decentralized Identity System**
