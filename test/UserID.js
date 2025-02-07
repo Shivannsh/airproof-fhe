@@ -3,9 +3,9 @@ import { createInstance } from "../utils/create-instance.js";
 import { loadABI } from "../utils/load-abi.js";
 import logger from "../utils/logger.js";
 
-const UserIDContractAddress = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
-const IdStorageContractAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
-const CitizenClaimAddress="0x786FA365fc8b2161Fa66DB74d50930aD71061245"
+const UserIDContractAddress = "0xbE597ddB9fC5D9d37df0Ed1cf2b920317fFFCd49";
+const IdStorageContractAddress = "0x1c4988260fECAE86dc4d83a5Bd190C36ECb222e1";
+const CitizenClaimAddress = "0xb9d2818be326A5f05405799d9314207052CD1212";
 
 import { ethers } from "ethers";
 

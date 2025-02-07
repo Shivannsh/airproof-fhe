@@ -13,9 +13,9 @@ let contractName = "CitizenClaim.sol";
 
 async function deployAndSave() {
   try {
-    const UserIDContractAddress = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
-    const IdStorageContractAddress = "0x00d06D3b6fF03fc136646f4e1137B374d3Aa9754";
-    // const CitizenClaim = "0x8d63ADfdb58f7122bBED6a6cbd5cae6CDA4eF59e";
+    const UserIDContractAddress = "0xbE597ddB9fC5D9d37df0Ed1cf2b920317fFFCd49";
+    const IdStorageContractAddress = "0x1c4988260fECAE86dc4d83a5Bd190C36ECb222e1";
+    // const CitizenClaim = "0x41EFF6219D7606c58302000AdE8b9b3477EB0cC2";
     
 
     logger.boldinfo("========== DEPLOYING USER CONTRACT ==========");
@@ -24,7 +24,7 @@ async function deployAndSave() {
       networkUrl,
       privateKeyTest,
       contractName,
-      [IdStorageContractAddress,UserIDContractAddress]
+      [IdStorageContractAddress, UserIDContractAddress],
     );
     const contractAddress = await contract.getAddress();
 

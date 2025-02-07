@@ -3,11 +3,10 @@ import path, { resolve } from "path";
 import logger from "./utils/logger.js";
 import { getEnvironmentVariables } from "./utils/env.js";
 import { deriveWalletsAndDetails } from "./utils/wallet.js";
-import { generateId, getId , getAddress } from "./test/IdStorage.js";
+import { generateId, getId , getAddress , resetIdForAddress } from "./test/IdStorage.js";
 import { getIdentity,registerIdentity,generateClaim, getBirthdate , getMyIdentityFirstname } from "./test/UserID.js";
 let { networkUrl, mnemonic } = getEnvironmentVariables();
 let { privateKeyTest } = deriveWalletsAndDetails(mnemonic);
-console.log(privateKeyTest)
 let contractName = "UserID.sol";
 let filename = contractName.split(".")[0];
 
@@ -26,7 +25,7 @@ async function interactWithContract() {
     //   privateKeyTest,
     //   contractAddress,
     // );
-    // logger.info(`generateID: ${generatedId}`);
+    // logger.info(`generateID TransactionHash : ${generatedId}`);
     // await new Promise((resolve) => setTimeout(resolve, 3000));
 
 
@@ -36,7 +35,7 @@ async function interactWithContract() {
     //   privateKeyTest,
     //   contractAddress
     // );
-    // logger.info(`getID: ${getIDResult}`);
+    // logger.info(`getID Output: ${getIDResult}`);
 
 
     // const addressResult = await getAddress(
@@ -45,7 +44,15 @@ async function interactWithContract() {
     //   privateKeyTest,
     //   contractAddress
     // );
-    // logger.info(`getAddress: ${addressResult}`);
+    // logger.info(`getAddress output: ${addressResult}`);
+
+    // const removeIdResult = await resetIdForAddress(
+    //   filename,
+    //   networkUrl,
+    //   privateKeyTest,
+    //   contractAddress
+    // );
+    // logger.info(`resetIdForAddress transactionHash: ${removeIdResult}`);
 
 // ================================================================================================
 
